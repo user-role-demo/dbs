@@ -22,8 +22,8 @@ class Role(Base):
         return f'Role {self.uid}, {self.name}'
 
 
-class UserRole(Base):
-    __tablename__ = 'user_roles'
+class Ability(Base):
+    __tablename__ = 'ability'
     uid = Column(Integer, primary_key=True)
     user_id = Column(Integer, ForeignKey(User.uid), nullable=False)
     role_id = Column(Integer, ForeignKey(Role.uid), nullable=False)
@@ -31,7 +31,7 @@ class UserRole(Base):
     role = relationship('Role', lazy='joined')
 
     def __repr__(self) -> str:
-        return f'UserRole user: {self.user_id} role: {self.role_id}'
+        return f'Ability user: {self.user_id} role: {self.role_id}'
 
 
 def create_db():

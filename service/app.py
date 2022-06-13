@@ -6,6 +6,7 @@ from werkzeug.exceptions import HTTPException
 
 from service.db import db_session
 from service.errors import AppError
+from service.views.abilities import ability_view
 from service.views.roles import role_view
 from service.views.users import user_view
 
@@ -31,6 +32,7 @@ def create_app():
 
     app.register_blueprint(user_view, url_prefix='/api/v1/users')
     app.register_blueprint(role_view, url_prefix='/api/v1/roles')
+    app.register_blueprint(ability_view, url_prefix='/api/v1/abilities')
 
     app.register_error_handler(HTTPException, handle_http_exceptions)
     app.register_error_handler(AppError, handle_app_error)

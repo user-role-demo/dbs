@@ -1,0 +1,21 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "service",
+            "type": "python",
+            "request": "launch",
+            "module": "service",
+            "envFile": "${workspaceFolder}/.env",
+            "console": "internalConsole",
+        },
+        {
+            "name": "create_db",
+            "type": "python",
+            "request": "launch",
+            "module": "service.models",
+            "console": "internalConsole",
+            "envFile": "${workspaceFolder}/.env"
+        }
+    ]
+}

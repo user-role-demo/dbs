@@ -15,3 +15,12 @@ class Role(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+class Ability(BaseModel):
+    uid: int
+    user_id: int
+    role_id: int
+
+    class Config:
+        orm_mode = True

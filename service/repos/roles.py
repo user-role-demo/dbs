@@ -2,7 +2,7 @@ from sqlalchemy.exc import IntegrityError
 
 from service.db import db_session
 from service.errors import ConflictError, NotFoundError
-from service.models import Role
+from service.models import Ability, Role, User
 
 
 class RolesRepo:
@@ -27,9 +27,7 @@ class RolesRepo:
         return Role.query.all()
 
     def update(self, uid: int, new_name: str) -> Role:
-        role = Role.query.filter(Role.uid == uid).first()
-        if not role:
-            raise NotFoundError(self.name)
+        role = self.get_by_uid(uid)
         try:
             role.name = new_name
             db_session.commit()
@@ -38,8 +36,13 @@ class RolesRepo:
         return role
 
     def delete(self, uid: int) -> None:
-        role = Role.query.filter(Role.uid == uid).first()
-        if not role:
-            raise NotFoundError(self.name)
+        role = self.get_by_uid(uid)
+        abilities = db_session.query(Ability).filter(Ability.role_id == uid)
+        for ability in abilities:
+            db_session.delete(ability)
         db_session.delete(role)
         db_session.commit()
+
+    def get_users(self, uid: int) -> list[User]:
+        self.get_by_uid(uid)
+        return db_session.query(User).join(Ability).filter(Ability.role_id == uid)

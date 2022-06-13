@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from flask import Blueprint, abort, jsonify, request
+from flask import Blueprint, jsonify, request
 
 from service import schemas
 from service.repos.roles import RolesRepo
@@ -13,9 +13,6 @@ repo = RolesRepo()
 @role_view.post('/')
 def add_role():
     payload = request.json
-    if not payload:
-        abort(HTTPStatus.BAD_REQUEST, 'The body of the request could not be empty')
-
     payload['uid'] = -1
     role = schemas.Role(**payload)
     entity = repo.add(rolename=role.name)
@@ -40,9 +37,6 @@ def get_role_by_id(uid: int):
 @role_view.put('/<uid>')
 def update_role(uid: int):
     payload = request.json
-    if not payload:
-        abort(HTTPStatus.BAD_REQUEST, 'The body of the request could not be empty')
-
     payload['uid'] = uid
     role = schemas.Role(**payload)
     entity = repo.update(uid=uid, new_name=role.name)
@@ -54,3 +48,10 @@ def update_role(uid: int):
 def delete_role(uid: int):
     repo.delete(uid)
     return {}, HTTPStatus.NO_CONTENT
+
+
+@role_view.get('/<role_id>/users')
+def get_users(role_id: int):
+    entities = repo.get_users(uid=role_id)
+    users = [schemas.User.from_orm(entity).dict() for entity in entities]
+    return jsonify(users), HTTPStatus.OK

@@ -1,6 +1,6 @@
 from http import HTTPStatus
 
-from flask import Blueprint, abort, jsonify, request
+from flask import Blueprint, jsonify, request
 
 from service import schemas
 from service.repos.users import UsersRepo
@@ -13,9 +13,6 @@ repo = UsersRepo()
 @user_view.post('/')
 def add_user():
     payload = request.json
-    if not payload:
-        abort(HTTPStatus.BAD_REQUEST, 'The body of the request could not be empty')
-
     payload['uid'] = -1
     user = schemas.User(**payload)
     entity = repo.add(username=user.name)
@@ -40,9 +37,6 @@ def get_user_by_id(uid: int):
 @user_view.put('/<uid>')
 def update_user(uid: int):
     payload = request.json
-    if not payload:
-        abort(HTTPStatus.BAD_REQUEST, 'The body of the request could not be empty')
-
     payload['uid'] = uid
     user = schemas.User(**payload)
     entity = repo.update(uid=uid, new_name=user.name)
@@ -53,4 +47,28 @@ def update_user(uid: int):
 @user_view.delete('/<uid>')
 def delete_user(uid: int):
     repo.delete(uid)
+    return {}, HTTPStatus.NO_CONTENT
+
+
+@user_view.post('/<user_id>/roles')
+def add_role(user_id: int):
+    payload = request.json
+    payload['uid'] = -1
+    payload['user_id'] = user_id
+    ability = schemas.Ability(**payload)
+    entity = repo.add_role(user_id=user_id, role_id=ability.role_id)
+    new_role = schemas.Role.from_orm(entity)
+    return new_role.dict(), HTTPStatus.CREATED
+
+
+@user_view.get('/<user_id>/roles')
+def get_roles(user_id: int):
+    entities = repo.get_roles(uid=user_id)
+    roles = [schemas.Role.from_orm(entity).dict() for entity in entities]
+    return jsonify(roles), HTTPStatus.OK
+
+
+@user_view.delete('/<user_id>/roles/<role_id>')
+def delete_role(user_id: int, role_id: int):
+    repo.delete_role(user_id=user_id, role_id=role_id)
     return {}, HTTPStatus.NO_CONTENT

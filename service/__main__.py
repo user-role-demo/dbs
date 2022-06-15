@@ -8,7 +8,7 @@ def main():
     app.run(
         port=app_config.app_port,
         host=app_config.app_host,
-        debug=True,
+        debug=app_config.debug,
     )
 
 
